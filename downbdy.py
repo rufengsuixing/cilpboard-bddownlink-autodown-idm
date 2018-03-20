@@ -13,14 +13,13 @@ class clipboard():
         print('clipboard success')
 
     def __get(self):
-        try:
-            win32clipboard.OpenClipboard()
-            d = win32clipboard.GetClipboardData(win32con.CF_TEXT)
-        except:
-            return ''
+        win32clipboard.OpenClipboard()
+        if win32clipboard.IsClipboardFormatAvailable(win32clipboard.CF_UNICODETEXT):
+            d = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
+        else:
+            d=''
         win32clipboard.CloseClipboard()
-        return d.decode(encoding='gbk')
-
+        return d
     def get(self):
         d = self.__get()
         self.new = d
@@ -67,6 +66,7 @@ def idm_down(url, targetdir=tar, idmpath=idmpath):
     a.kill()
 
 def main():
+    global tar
     if tar[-1]=='/':
         tar=tar[:-1]
     downloaddir=tar
@@ -80,6 +80,12 @@ def main():
             if not os.path.isdir(downloaddir):
                 os.makedirs(downloaddir)
             print(downloaddir)
+        elif cl_b_d.find("www.baidupcs.com") != -1:
+            cl_b_d = cl_b_d.replace('\r', '')
+            downli = cl_b_d.split('\n')
+            print('get ', len(downli), 'rar links')
+            for a in downli:
+                idm_down(a, targetdir=downloaddir)
         elif cl_b_d.find("d.pcs.baidu.com") != -1:
             cl_b_d = cl_b_d.replace('\r', '')
             downli = cl_b_d.split('\n')
